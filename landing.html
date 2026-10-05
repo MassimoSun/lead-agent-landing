@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Максим Сафонов — Telegram-боты, парсеры и автоматизация</title>
+<meta name="description" content="Разработка Telegram-ботов на aiogram 3, парсеров на Python/Playwright и автоматизации на n8n. 15+ лет в B2B, 2 бота в продакшене.">
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#161b22; --line:#21262d; --fg:#e6edf3; --muted:#8b949e;
+    --acc:#2f81f7; --ok:#3fb950; --warn:#d29922; --radius:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--fg);
+    font:16px/1.65 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{padding:64px 0 40px;border-bottom:1px solid var(--line)}
+  .tag{
+    display:inline-block;padding:5px 12px;border:1px solid var(--acc);
+    border-radius:99px;color:var(--acc);font-size:13px;font-weight:600;
+    letter-spacing:.3px;margin-bottom:18px;
+  }
+  h1{font-size:clamp(30px,5vw,46px);line-height:1.15;letter-spacing:-.5px;margin-bottom:18px}
+  h1 span{color:var(--acc)}
+  .lead{font-size:19px;color:var(--muted);max-width:760px;margin-bottom:28px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .btn{
+    display:inline-block;padding:13px 24px;border-radius:9px;font-weight:600;
+    text-decoration:none;font-size:15px;transition:.15s;
+  }
+  .btn-p{background:var(--acc);color:#fff}
+  .btn-p:hover{background:#1f6feb;transform:translateY(-1px)}
+  .btn-s{border:1px solid var(--line);color:var(--fg);background:var(--bg2)}
+  .btn-s:hover{border-color:var(--muted)}
+  section{padding:56px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:27px;margin-bottom:10px;letter-spacing:-.3px}
+  .sub{color:var(--muted);margin-bottom:32px;font-size:17px}
+  h3{font-size:19px;margin-bottom:8px}
+  .grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .card{
+    background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px;display:flex;flex-direction:column;
+  }
+  .card:hover{border-color:var(--acc)}
+  .price{font-size:30px;font-weight:700;margin:14px 0 4px;letter-spacing:-.5px}
+  .price small{font-size:14px;color:var(--muted);font-weight:400;letter-spacing:0}
+  .meta{color:var(--muted);font-size:14px;margin-bottom:16px}
+  ul{list-style:none;margin-bottom:18px}
+  li{padding:7px 0 7px 24px;position:relative;font-size:15px;border-bottom:1px solid #1c2128}
+  li:last-child{border-bottom:0}
+  li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:700}
+  li.off::before{content:"—";color:var(--muted)}
+  .rec{border-color:var(--acc);position:relative}
+  .rec::before{
+    content:"популярно";position:absolute;top:-11px;left:26px;background:var(--acc);
+    color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;
+    text-transform:uppercase;letter-spacing:.5px;
+  }
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:600}
+  .p-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+  .p-n{background:rgba(139,148,158,.15);color:var(--muted)}
+  .p-w{background:rgba(210,153,34,.15);color:var(--warn)}
+  .cases{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .case{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+  .case h3{margin-bottom:6px}
+  .case .tech{color:var(--acc);font-size:13px;font-family:ui-monospace,monospace;margin-bottom:12px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px;margin-top:8px}
+  .stat b{display:block;font-size:27px;letter-spacing:-.5px}
+  .stat span{color:var(--muted);font-size:13px}
+  footer{padding:48px 0;text-align:center;color:var(--muted)}
+  .contact{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:26px}
+  .contact a{color:var(--acc);text-decoration:none;font-weight:600;font-size:17px}
+  code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:13px;
+       background:#21262d;padding:2px 6px;border-radius:4px}
+  @media(max-width:640px){header{padding:40px 0 30px}section{padding:40px 0}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="tag">Python · aiogram 3 · n8n · Playwright</div>
+  <h1>Делаю <span>Telegram-ботов, парсеры и автоматизацию</span> под ключ</h1>
+  <p class="lead">
+    15+ лет в B2B (продажи, закупки, 1С/Битрикс24). С 2025 — разработка
+    на Python. Два бота в продакшене, 202 теста, покрытие 96.7%.
+    Фиксированная цена, срок 3–7 дней, передаю исходники и инструкцию по запуску.
+  </p>
+  <div class="cta">
+    <a class="btn btn-p" href="https://t.me/safonov_max" target="_blank">Написать в Telegram</a>
+    <a class="btn btn-s" href="#services">Услуги и цены</a>
+    <a class="btn btn-s" href="#cases">Примеры работ</a>
+  </div>
+</div></header>
+
+<section id="services"><div class="wrap">
+  <h2>Услуги</h2>
+  <p class="sub">Три направления, которые закрывают типовые задачи бизнеса. Цена фиксируется после обсуждения ТЗ — вправо на объём.</p>
+
+  <div style="background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--acc);
+              border-radius:var(--radius);padding:18px 22px;margin-bottom:28px">
+    <div style="font-weight:600;margin-bottom:10px">Что входит в цену и что меняет итог</div>
+    <div style="color:var(--muted);font-size:15px">
+      Цена указана за работу <b style="color:var(--fg)">под ключ</b>: архитектура, код,
+      тесты, деплой на ваш сервер, передача исходников и 30 дней гарантии.
+      Объём определяет разброс внутри диапазона:
+      <div style="margin-top:10px">
+        Простой бот с формой заявки и админкой — <b style="color:var(--fg)">от 8 000 ₽</b><br>
+        Бот с каталогом, ЛК и лимитами — <b style="color:var(--fg)">15 000–25 000 ₽</b><br>
+        Бот с Mini App и приёмом оплаты (как в кейсе ниже) — <b style="color:var(--fg)">30 000–40 000 ₽</b>
+      </div>
+      <div style="margin-top:10px">Считаю по ТЗ, а не по формуле «сложность × ставка» — называю цену до начала работы.</div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <div class="card rec">
+      <h3>Telegram-бот</h3>
+      <div class="price">15 000 – 40 000 ₽ <small>/ проект</small></div>
+      <div class="meta">срок 3–7 дней · aiogram 3 · Mini App · платежи</div>
+      <ul>
+        <li>Каталог, заявки, админ-панель</li>
+        <li>Оплата внутри Telegram (Stars / карта)</li>
+        <li>Mini App на WebApp SDK с проверкой подписи</li>
+        <li>Подписки, лимиты, промокоды</li>
+        <li class="off">Рассылки и спам — не делаю</li>
+      </ul>
+      <a class="btn btn-p" href="https://t.me/safonov_max" target="_blank">Обсудить</a>
+    </div>
+
+    <div class="card">
+      <h3>Парсер / сбор данных</h3>
+      <div class="price">10 000 – 25 000 ₽ <small>/ проект</small></div>
+      <div class="meta">срок 2–5 дней · Python · Playwright · pandas</div>
+      <ul>
+        <li>Любой сайт, каталог или маркетплейс</li>
+        <li>Обход динамического JS-контента</li>
+        <li>Выгрузка в Excel / CSV / Google Sheets</li>
+        <li>Планировщик на cron, уведомление в Telegram</li>
+        <li class="off">Данные, защищённые авторизацией, — по договору</li>
+      </ul>
+      <a class="btn btn-s" href="https://t.me/safonov_max" target="_blank">Обсудить</a>
+    </div>
+
+    <div class="card">
+      <h3>Автоматизация процессов</h3>
+      <div class="price">15 000 – 35 000 ₽ <small>/ проект</small></div>
+      <div class="meta">срок 3–7 дней · n8n · 1С · amoCRM · Битрикс24</div>
+      <ul>
+        <li>Интеграция CRM / 1С / таблиц</li>
+        <li>Сценарии n8n: заявка → задача → оплата</li>
+        <li>Синхронизация данных между системами</li>
+        <li>Webhooks, REST API, очереди</li>
+        <li>Поддержка и доработки — от 3 000 ₽/мес</li>
+      </ul>
+      <a class="btn btn-s" href="https://t.me/safonov_max" target="_blank">Обсудить</a>
+    </div>
+
+  </div>
+</div></section>
+
+<section id="process"><div class="wrap">
+  <h2>Как идёт работа</h2>
+  <p class="sub">Прозрачный процесс: вы знаете, что происходит и когда ждать результат.</p>
+  <table>
+    <tr><th>Этап</th><th>Что делаю</th><th>Срок</th></tr>
+    <tr><td><b>1. Бриф</b></td><td>Уточняю задачу, показываю 2–3 сценария реализации и цену</td><td class="num">1 день</td></tr>
+    <tr><td><b>2. Договор</b></td><td>Фиксируем объём, цену и сроки. Предоплата 50%</td><td class="num">1 день</td></tr>
+    <tr><td><b>3. Разработка</b></td><td>Показываю промежуточный результат по ходу работы</td><td class="num">2–6 дней</td></tr>
+    <tr><td><b>4. Запуск</b></td><td>Тесты, деплой, передача исходников и инструкции</td><td class="num">1 день</td></tr>
+    <tr><td><b>5. Поддержка</b></td><td>30 дней гарантии на исправление багов</td><td class="num">30 дней</td></tr>
+  </table>
+</div></section>
+
+<section id="cases"><div class="wrap">
+  <h2>Примеры работ</h2>
+  <p class="sub">Проекты, работающие в продакшене — с кодом, тестами и мониторингом.</p>
+  <div class="cases">
+
+    <div class="case">
+      <h3>Астра — бот астрологии и таро</h3>
+      <div class="tech">aiogram 3 · SQLAlchemy 2 · swisseph · PostgreSQL · Docker</div>
+      <ul>
+        <li>Натальные карты на швейцарских эфемеридах</li>
+        <li>ИИ-астролог с памятью диалога и подстановкой данных карты</li>
+        <li>78 карт, 5 раскладов, Mini App, оплата Stars</li>
+        <li><code>/delete</code> стирает данные пользователя полностью (152-ФЗ)</li>
+      </ul>
+      <div class="stats">
+        <div class="stat"><b>202</b><span>теста</span></div>
+        <div class="stat"><b>96.7%</b><span>покрытие</span></div>
+        <div class="stat"><b>2</b><span>бота в проде</span></div>
+      </div>
+    </div>
+
+    <div class="case">
+      <h3>Ассистент продаж с ИИ</h3>
+      <div class="tech">Python · LLM · CRM · guardrails · PostgreSQL</div>
+      <ul>
+        <li>Диалог с клиентом и квалификация лидов</li>
+        <li>Запись разговора в CRM автоматически</li>
+        <li>Защита от галлюцинаций и утечек инструкций</li>
+        <li>Резервный провайдер LLM при отказе основного</li>
+      </ul>
+    </div>
+
+    <div class="case">
+      <h3>Lead Agent — поиск заказов</h3>
+      <div class="tech">Playwright · парсинг FL.ru / Kwork / Telegram · скоринг</div>
+      <ul>
+        <li>Собирает заказы по 4 площадкам каждые 2 часа</li>
+        <li>Скорит под мой стек: aiogram, n8n, 1С, парсинг</li>
+        <li>Отсевает вакансии, вебинары и заказы вне стека</li>
+        <li>Отдаёт Excel с приоритетом и бюджетом</li>
+      </ul>
+      <div class="stats">
+        <div class="stat"><b>376</b><span>лидов за цикл</span></div>
+        <div class="stat"><b>74</b><span>в наш стек</span></div>
+        <div class="stat"><b>0</b><span>ручной работы</span></div>
+      </div>
+    </div>
+
+  </div>
+</div></section>
+
+<section id="guarantee"><div class="wrap">
+  <h2>Почему со мной безопасно</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Прозрачный статус</h3>
+      <p class="meta" style="margin:0">Пишу по ходу работы, а не пропадаю до дедлайна. Понятно, что происходит с проектом.</p>
+    </div>
+    <div class="card">
+      <h3>Передаю все исходники</h3>
+      <p class="meta" style="margin:0">Код остаётся вашим. Никакой привязки к себе через закрытые репозитории.</p>
+    </div>
+    <div class="card">
+      <h3>Понимаю бизнес-процесс</h3>
+      <p class="meta" style="margin:0">15 лет закупок и продаж в стройматериалах. Знаю, зачем нужен процесс, а не только какой код написать.</p>
+    </div>
+    <div class="card">
+      <h3>Работаю с 44-ФЗ и 1С</h3>
+      <p class="meta" style="margin:0">Опыт интеграций с 1С, Битрикс24 и amoCRM в реальном учёте, а не в презентации.</p>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <h2 style="margin-bottom:10px">Обсудим задачу</h2>
+  <p style="margin-bottom:24px">Опишите, что нужно автоматизировать — отвечу в течение 2 часов.</p>
+  <div class="contact">
+    <a href="https://t.me/safonov_max" target="_blank">Telegram</a>
+    <a href="mailto:safonovmax@gmail.com">safonovmax@gmail.com</a>
+  </div>
+  <p style="font-size:13px">Максим Сафонов · Хабаровск · удалённая работа</p>
+</div></footer>
+
+</body>
+</html>
