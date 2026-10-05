@@ -7,79 +7,151 @@
 <meta name="description" content="Разработка Telegram-ботов на aiogram 3, парсеров на Python/Playwright и автоматизации на n8n. 15+ лет в B2B, 2 бота в продакшене.">
 <style>
   :root{
-    --bg:#0d1117; --bg2:#161b22; --line:#21262d; --fg:#e6edf3; --muted:#8b949e;
-    --acc:#2f81f7; --ok:#3fb950; --warn:#d29922; --radius:12px;
+    --bg:#080c12; --bg2:#0f1520; --bg3:#151e2d; --bg4:#1a2738;
+    --line:#1c2a3a; --fg:#e4eaf1; --muted:#5a7088;
+    --acc:#00e4b8; --acc2:#00b894; --acc-glow:rgba(0,228,184,.18);
+    --warn:#f5a623; --danger:#ff4757;
+    --radius:16px; --radius-sm:10px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
   body{
     background:var(--bg);color:var(--fg);
     font:16px/1.65 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-    -webkit-font-smoothing:antialiased;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
   }
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
-  header{padding:64px 0 40px;border-bottom:1px solid var(--line)}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+
+  /* ── ambient glow ── */
+  body::before{
+    content:"";position:fixed;top:-20%;left:-10%;width:500px;height:500px;
+    background:radial-gradient(circle,var(--acc-glow) 0%,transparent 70%);
+    pointer-events:none;z-index:0;
+  }
+  body::after{
+    content:"";position:fixed;bottom:-10%;right:-5%;width:400px;height:400px;
+    background:radial-gradient(circle,rgba(0,184,148,.08) 0%,transparent 70%);
+    pointer-events:none;z-index:0;
+  }
+
+  /* ── Hero ── */
+  header{
+    padding:120px 0 70px;position:relative;text-align:center;
+    border-bottom:1px solid var(--line);
+    background:radial-gradient(ellipse 90% 70% at 50% 0%,rgba(0,228,184,.07) 0%,transparent 60%);
+  }
   .tag{
-    display:inline-block;padding:5px 12px;border:1px solid var(--acc);
+    display:inline-block;padding:7px 18px;border:1px solid var(--acc);
     border-radius:99px;color:var(--acc);font-size:13px;font-weight:600;
-    letter-spacing:.3px;margin-bottom:18px;
+    letter-spacing:.6px;margin-bottom:22px;background:rgba(0,228,184,.07);
+    backdrop-filter:blur(6px);animation:fadeUp .6s ease both;
   }
-  h1{font-size:clamp(30px,5vw,46px);line-height:1.15;letter-spacing:-.5px;margin-bottom:18px}
-  h1 span{color:var(--acc)}
-  .lead{font-size:19px;color:var(--muted);max-width:760px;margin-bottom:28px}
-  .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  h1{
+    font-size:clamp(30px,5.5vw,52px);line-height:1.1;letter-spacing:-1.2px;margin-bottom:20px;
+    font-weight:800;animation:fadeUp .6s ease .1s both;
+  }
+  h1 span{color:var(--acc);background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .lead{font-size:18px;color:var(--muted);max-width:640px;margin:0 auto 34px;line-height:1.7;animation:fadeUp .6s ease .2s both}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;animation:fadeUp .6s ease .3s both}
   .btn{
-    display:inline-block;padding:13px 24px;border-radius:9px;font-weight:600;
-    text-decoration:none;font-size:15px;transition:.15s;
+    display:inline-block;padding:14px 28px;border-radius:10px;font-weight:600;
+    text-decoration:none;font-size:15px;transition:.25s;cursor:pointer;border:none;
   }
-  .btn-p{background:var(--acc);color:#fff}
-  .btn-p:hover{background:#1f6feb;transform:translateY(-1px)}
+  .btn-p{
+    background:linear-gradient(135deg,var(--acc),var(--acc2));color:#080c12;
+    box-shadow:0 4px 24px rgba(0,228,184,.3);
+  }
+  .btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 32px rgba(0,228,184,.45)}
   .btn-s{border:1px solid var(--line);color:var(--fg);background:var(--bg2)}
-  .btn-s:hover{border-color:var(--muted)}
-  section{padding:56px 0;border-bottom:1px solid var(--line)}
-  h2{font-size:27px;margin-bottom:10px;letter-spacing:-.3px}
-  .sub{color:var(--muted);margin-bottom:32px;font-size:17px}
-  h3{font-size:19px;margin-bottom:8px}
-  .grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .btn-s:hover{border-color:var(--acc);color:var(--acc)}
+
+  /* ── Sections ── */
+  section{padding:72px 0;position:relative;z-index:1}
+  section:nth-child(even){background:var(--bg2)}
+  h2{font-size:30px;margin-bottom:10px;letter-spacing:-.5px;font-weight:700}
+  .sub{color:var(--muted);margin-bottom:38px;font-size:17px}
+  h3{font-size:18px;margin-bottom:6px;font-weight:600}
+
+  /* ── Grid / Cards ── */
+  .grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
   .card{
-    background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);
-    padding:26px;display:flex;flex-direction:column;
+    background:var(--bg3);border:1px solid var(--line);border-radius:var(--radius);
+    padding:30px;display:flex;flex-direction:column;transition:.3s;position:relative;overflow:hidden;
   }
-  .card:hover{border-color:var(--acc)}
-  .price{font-size:30px;font-weight:700;margin:14px 0 4px;letter-spacing:-.5px}
+  .card::after{
+    content:"";position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--acc),transparent);
+    opacity:0;transition:.3s;
+  }
+  .card:hover{border-color:rgba(0,228,184,.25);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .card:hover::after{opacity:1}
+  .price{font-size:32px;font-weight:700;margin:16px 0 4px;letter-spacing:-.5px}
   .price small{font-size:14px;color:var(--muted);font-weight:400;letter-spacing:0}
-  .meta{color:var(--muted);font-size:14px;margin-bottom:16px}
-  ul{list-style:none;margin-bottom:18px}
-  li{padding:7px 0 7px 24px;position:relative;font-size:15px;border-bottom:1px solid #1c2128}
+  .meta{color:var(--muted);font-size:14px;margin-bottom:18px}
+  ul{list-style:none;margin-bottom:20px}
+  li{padding:8px 0 8px 28px;position:relative;font-size:15px;border-bottom:1px solid #1a2535}
   li:last-child{border-bottom:0}
-  li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:700}
-  li.off::before{content:"—";color:var(--muted)}
-  .rec{border-color:var(--acc);position:relative}
+  li::before{content:"→";position:absolute;left:0;color:var(--acc);font-weight:700;font-size:14px}
+  li.off::before{content:"✕";color:var(--muted)}
+  li.off{opacity:.45}
+  .rec{border-color:var(--acc);background:linear-gradient(180deg,rgba(0,228,184,.05),var(--bg3))}
   .rec::before{
-    content:"популярно";position:absolute;top:-11px;left:26px;background:var(--acc);
-    color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;
+    content:"популярно";position:absolute;top:-11px;left:26px;
+    background:linear-gradient(135deg,var(--acc),var(--acc2));
+    color:#080c12;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;
     text-transform:uppercase;letter-spacing:.5px;
   }
+
+  /* ── Table ── */
   table{width:100%;border-collapse:collapse;font-size:15px}
-  th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+  th,td{text-align:left;padding:14px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+  td:first-child{font-weight:600;white-space:nowrap}
   .num{font-variant-numeric:tabular-nums;white-space:nowrap}
-  .pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:600}
-  .p-ok{background:rgba(63,185,80,.15);color:var(--ok)}
-  .p-n{background:rgba(139,148,158,.15);color:var(--muted)}
-  .p-w{background:rgba(210,153,34,.15);color:var(--warn)}
-  .cases{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
-  .case{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
-  .case h3{margin-bottom:6px}
-  .case .tech{color:var(--acc);font-size:13px;font-family:ui-monospace,monospace;margin-bottom:12px}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px;margin-top:8px}
-  .stat b{display:block;font-size:27px;letter-spacing:-.5px}
+
+  /* ── Info box ── */
+  .info-box{
+    background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--acc);
+    border-radius:var(--radius);padding:22px 26px;margin-bottom:34px;
+  }
+  .info-box b{color:var(--fg)}
+  .info-box div+div{margin-top:8px;font-size:15px;color:var(--muted)}
+
+  /* ── Stats ── */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:18px;margin-top:16px}
+  .stat b{display:block;font-size:30px;letter-spacing:-.5px;color:var(--acc)}
   .stat span{color:var(--muted);font-size:13px}
-  footer{padding:48px 0;text-align:center;color:var(--muted)}
-  .contact{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:26px}
-  .contact a{color:var(--acc);text-decoration:none;font-weight:600;font-size:17px}
-  code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:13px;
-       background:#21262d;padding:2px 6px;border-radius:4px}
-  @media(max-width:640px){header{padding:40px 0 30px}section{padding:40px 0}}
+
+  /* ── Cases ── */
+  .cases{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+  .case{background:var(--bg3);border:1px solid var(--line);border-radius:var(--radius);padding:28px;transition:.25s}
+  .case:hover{border-color:rgba(0,228,184,.2);transform:translateY(-2px)}
+  .case h3{margin-bottom:6px}
+  .case .tech{color:var(--acc);font-size:13px;font-family:ui-monospace,monospace;margin-bottom:14px;opacity:.8}
+
+  /* ── Footer ── */
+  footer{padding:56px 0;text-align:center;color:var(--muted);position:relative;z-index:1}
+  .contact{display:inline-flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-bottom:28px}
+  .contact a{color:var(--acc);text-decoration:none;font-weight:600;font-size:18px;transition:.15s}
+  .contact a:hover{text-decoration:underline}
+  footer p+p{font-size:13px;margin-top:8px;opacity:.5}
+
+  /* ── Code ── */
+  code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:13px;background:var(--bg);padding:2px 7px;border-radius:5px;border:1px solid var(--line)}
+
+  @media(max-width:640px){
+    header{padding:60px 0 40px}
+    section{padding:52px 0}
+    .grid,.cases{grid-template-columns:1fr}
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .card,.case,.info-box{animation:fadeUp .5s ease both}
+  .card:nth-child(2){animation-delay:.08s}
+  .card:nth-child(3){animation-delay:.16s}
+  .case:nth-child(2){animation-delay:.08s}
+  .case:nth-child(3){animation-delay:.16s}
 </style>
 </head>
 <body>
@@ -101,19 +173,18 @@
 
 <section id="services"><div class="wrap">
   <h2>Услуги</h2>
-  <p class="sub">Три направления, которые закрывают типовые задачи бизнеса. Цена фиксируется после обсуждения ТЗ — вправо на объём.</p>
+  <p class="sub">Три направления, которые закрывают типовые задачи бизнеса. Цена фиксируется после обсуждения ТЗ — вправу на объём.</p>
 
-  <div style="background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--acc);
-              border-radius:var(--radius);padding:18px 22px;margin-bottom:28px">
+  <div class="info-box">
     <div style="font-weight:600;margin-bottom:10px">Что входит в цену и что меняет итог</div>
-    <div style="color:var(--muted);font-size:15px">
-      Цена указана за работу <b style="color:var(--fg)">под ключ</b>: архитектура, код,
+    <div>
+      Цена указана за работу <b>под ключ</b>: архитектура, код,
       тесты, деплой на ваш сервер, передача исходников и 30 дней гарантии.
       Объём определяет разброс внутри диапазона:
       <div style="margin-top:10px">
-        Простой бот с формой заявки и админкой — <b style="color:var(--fg)">от 8 000 ₽</b><br>
-        Бот с каталогом, ЛК и лимитами — <b style="color:var(--fg)">15 000–25 000 ₽</b><br>
-        Бот с Mini App и приёмом оплаты (как в кейсе ниже) — <b style="color:var(--fg)">30 000–40 000 ₽</b>
+        Простой бот с формой заявки и админкой — <b>от 8 000 ₽</b><br>
+        Бот с каталогом, ЛК и лимитами — <b>15 000–25 000 ₽</b><br>
+        Бот с Mini App и приёмом оплаты (как в кейсе ниже) — <b>30 000–40 000 ₽</b>
       </div>
       <div style="margin-top:10px">Считаю по ТЗ, а не по формуле «сложность × ставка» — называю цену до начала работы.</div>
     </div>
@@ -170,7 +241,7 @@
   <h2>Как идёт работа</h2>
   <p class="sub">Прозрачный процесс: вы знаете, что происходит и когда ждать результат.</p>
   <table>
-    <tr><th>Этап</th><th>Что делаю</th><th>Срок</th></tr>
+    <tr><th>Этап</th><th>Что делаю</th><th class="num">Срок</th></tr>
     <tr><td><b>1. Бриф</b></td><td>Уточняю задачу, показываю 2–3 сценария реализации и цену</td><td class="num">1 день</td></tr>
     <tr><td><b>2. Договор</b></td><td>Фиксируем объём, цену и сроки. Предоплата 50%</td><td class="num">1 день</td></tr>
     <tr><td><b>3. Разработка</b></td><td>Показываю промежуточный результат по ходу работы</td><td class="num">2–6 дней</td></tr>
@@ -259,7 +330,7 @@
     <a href="https://t.me/safonov_max" target="_blank">Telegram</a>
     <a href="mailto:safonovmax@gmail.com">safonovmax@gmail.com</a>
   </div>
-  <p style="font-size:13px">Максим Сафонов · Хабаровск · удалённая работа</p>
+  <p>Максим Сафонов · Хабаровск · удалённая работа</p>
 </div></footer>
 
 </body>
